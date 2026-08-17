@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>لوحة التحكم | أسواق الخير</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Tajawal', 'sans-serif']
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans min-h-screen flex flex-col md:flex-row pb-16 md:pb-0">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 p-6 hidden md:flex flex-col justify-between shrink-0">
+
+        <div class="space-y-8">
+
+            <div class="flex items-center gap-3">
+                <div class="bg-brand-500 text-white p-2.5 rounded-2xl shadow-md">
+                    <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+                </div>
+
+                <h2 class="text-xl font-black">
+                    لوحة التحكم
+                </h2>
+            </div>
+
+            <nav class="space-y-2">
+
+                <button
+                    onclick="switchTab('orders')"
+                    id="dt-tab-orders"
+                    class="w-full flex items-center justify-between px-4 py-3 rounded-2xl font-bold bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                        <span>الطلبات</span>
+                    </div>
+
+                </button>
+
+                <button
+                    onclick="switchTab('products')"
+                    id="dt-tab-products"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-400">
+
+                    <i data-lucide="package" class="w-5 h-5"></i>
+                    <span>إدارة المنتجات</span>
+
+                </button>
+
+                <button
+                    onclick="switchTab('add-product')"
+                    id="dt-tab-add"
+                    class="w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-400">
+
+                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                    <span>إضافة منتج</span>
+
+                </button>
+
+            </nav>
+
+        </div>
+
+        <button
+            onclick="toggleDarkMode()"
+            class="w-full flex items-center justify-between px-4 py-3 rounded-2xl bg-gray-100 dark:bg-gray-700 text-sm font-bold">
+
+            <span class="flex items-center gap-2">
+                <i data-lucide="moon" class="w-4 h-4"></i>
+                الوضع الداكن
+            </span>
+
+        </button>
+
+    </aside>
+
+
+    <!-- Main -->
+    <div class="flex-1 flex flex-col min-w-0">
+
+        <!-- Header -->
+        <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 h-16 px-4 md:px-6 flex items-center justify-between sticky top-0 z-10">
+
+            <h1
+                class="text-lg md:text-xl font-black truncate"
+                id="page-title">
+
+                استقبال الطلبات
+
+            </h1>
+
+            <button
+                onclick="toggleDarkMode()"
+                class="md:hidden p-2 rounded-xl bg-gray-100 dark:bg-gray-700">
+
+                <i data-lucide="moon" class="w-5 h-5"></i>
+
+            </button>
+
+        </header>
+
+
+        <!-- Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+
+
+            <!-- Orders -->
+            <div
+                id="section-orders"
+                class="section-view space-y-4">
+
+                <div class="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm p-8 text-center">
+
+                    <i
+                        data-lucide="shopping-bag"
+                        class="w-12 h-12 mx-auto text-gray-300 mb-3">
+                    </i>
+
+                    <h2 class="text-xl font-bold">
+                        الطلبات
+                    </h2>
+
+                    <p class="text-gray-500 mt-2">
+                        قسم الطلبات جاهز للربط بجدول الطلبات لاحقًا.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Products -->
+            <div
+                id="section-products"
+                class="section-view hidden space-y-4">
+
+                <div class="flex justify-between items-center">
+
+                    <h2 class="text-lg font-bold">
+
+                        المنتجات المعروضة حالياً
+
+                        (<span id="prod-count">0</span>)
+
+                    </h2>
+
+                    <button
+                        onclick="loadProducts()"
+                        class="bg-brand-600 text-white px-4 py-2 rounded-xl text-sm font-bold">
+
+                        تحديث
+
+                    </button>
+
+                </div>
+
+                <div
+                    id="products-list"
+                    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                </div>
+
+            </div>
+
+
+            <!-- Add Product -->
+            <div
+                id="section-add-product"
+                class="section-view hidden max-w-xl mx-auto">
+
+                <div class="bg-white dark:bg-gray-800 p-5 md:p-8 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm space-y-4">
+
+                    <h2 class="text-xl font-bold">
+                        إضافة منتج جديد
+                    </h2>
+
+                    <form
+                        id="product-form"
+                        onsubmit="handleAddProduct(event)"
+                        class="space-y-4">
+
+
+                        <!-- Name -->
+                        <div>
+
+                            <label class="text-xs font-bold text-gray-500">
+                                اسم المنتج
+                            </label>
+
+                            <input
+                                type="text"
+                                id="p-name"
+                                required
+                                class="w-full mt-1 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:outline-none">
+
+                        </div>
+
+
+                        <!-- Category -->
+                        <div>
+
+                            <label class="text-xs font-bold text-gray-500">
+                                القسم
+                            </label>
+
+                            <select
+                                id="p-category"
+                                required
+                                class="w-full mt-1 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:outline-none">
+
+                                <option value="chocolates">
+                                    شوكولاتة
+                                </option>
+
+                                <option value="dairy">
+                                    ألبان وأجبان
+                                </option>
+
+                                <option value="canned">
+                                    مخازن ومعلبات
+                                </option>
+
+                                <option value="drinks">
+                                    مشروبات ومياه
+                                </option>
+
+                                <option value="cleaners">
+                                    منظفات
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- Description -->
+                        <div>
+
+                            <label class="text-xs font-bold text-gray-500">
+                                وصف المنتج
+                            </label>
+
+                            <textarea
+                                id="p-description"
+                                rows="3"
+                                class="w-full mt-1 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:outline-none"
+                                placeholder="اكتب وصف المنتج">
+
+                            </textarea>
+
+                        </div>
+
+
+                        <!-- Price -->
+                        <div>
+
+                            <label class="text-xs font-bold text-gray-500">
+                                السعر (ج.م)
+                            </label>
+
+                            <input
+                                type="number"
+                                id="p-price"
+                                min="0"
+                                step="0.01"
+                                required
+                                class="w-full mt-1 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:outline-none">
+
+                        </div>
+
+
+                        <!-- Image -->
+                        <div>
+
+                            <label class="text-xs font-bold text-gray-500">
+                                رابط الصورة
+                            </label>
+
+                            <input
+                                type="url"
+                                id="p-image"
+                                placeholder="https://..."
+                                required
+                                class="w-full mt-1 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl p-3 text-sm focus:outline-none">
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            id="save-product-btn"
+                            class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 rounded-xl text-sm shadow-md">
+
+                            حفظ ونشر المنتج
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- Mobile Navigation -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 h-16 flex items-center justify-around z-20 px-2">
+
+        <button
+            onclick="switchTab('orders')"
+            id="mb-tab-orders"
+            class="flex flex-col items-center gap-1 text-brand-600">
+
+            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold">الطلبات</span>
+
+        </button>
+
+
+        <button
+            onclick="switchTab('products')"
+            id="mb-tab-products"
+            class="flex flex-col items-center gap-1 text-gray-400">
+
+            <i data-lucide="package" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold">المنتجات</span>
+
+        </button>
+
+
+        <button
+            onclick="switchTab('add-product')"
+            id="mb-tab-add"
+            class="flex flex-col items-center gap-1 text-gray-400">
+
+            <i data-lucide="plus-circle" class="w-5 h-5"></i>
+            <span class="text-[10px] font-bold">إضافة</span>
+
+        </button>
+
+    </div>
+
+
+<script>
+
+/* =========================================================
+   إعدادات Supabase
+   ========================================================= */
+
+const SUPABASE_URL =
+    "https://neloaiilvuyicvydzuwo.supabase.co";
+
+/*
+   ضع هنا Publishable key الخاص بمشروع Supabase
+   لا تستخدم service_role
+*/
+const SUPABASE_KEY =
+    "YOUR_SUPABASE_PUBLISHABLE_KEY";
+
+
+/* =========================================================
+   فحص الاتصال
+   ========================================================= */
+
+async function supabaseRequest(url, options = {}) {
+
+    const response = await fetch(
+        SUPABASE_URL + url,
+        {
+            ...options,
+
+            headers: {
+                "apikey": SUPABASE_KEY,
+                "Authorization": `Bearer ${SUPABASE_KEY}`,
+                "Content-Type": "application/json",
+
+                ...(options.headers || {})
+            }
+        }
+    );
+
+
+    if (!response.ok) {
+
+        const errorText = await response.text();
+
+        throw new Error(
+            `Supabase Error ${response.status}: ${errorText}`
+        );
+
+    }
+
+
+    if (response.status === 204) {
+        return null;
+    }
+
+
+    return await response.json();
+
+}
+
+
+/* =========================================================
+   المنتجات
+   ========================================================= */
+
+let storeProducts = [];
+
+
+/* تحميل المنتجات من Supabase */
+
+async function loadProducts() {
+
+    const container =
+        document.getElementById("products-list");
+
+
+    container.innerHTML = `
+        <div class="col-span-full text-center py-12">
+
+            <div class="animate-spin w-8 h-8 border-4 border-brand-500 border-t-transparent rounded-full mx-auto mb-3"></div>
+
+            <p class="text-gray-500 font-bold">
+                جاري تحميل المنتجات...
+            </p>
+
+        </div>
+    `;
+
+
+    try {
+
+        const data =
+            await supabaseRequest(
+                "/rest/v1/products?select=*&order=created_at.desc"
+            );
+
+
+        storeProducts = data || [];
+
+        renderProducts();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        container.innerHTML = `
+            <div class="col-span-full bg-rose-50 dark:bg-rose-900/20 text-rose-600 p-6 rounded-2xl text-center">
+
+                <p class="font-bold mb-2">
+                    حدث خطأ أثناء تحميل المنتجات
+                </p>
+
+                <p class="text-sm break-all">
+                    ${escapeHtml(error.message)}
+                </p>
+
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* عرض المنتجات */
+
+function renderProducts() {
+
+    const container =
+        document.getElementById("products-list");
+
+
+    document.getElementById("prod-count").innerText =
+        storeProducts.length;
+
+
+    if (storeProducts.length === 0) {
+
+        container.innerHTML = `
+            <div class="col-span-full text-center py-12 text-gray-400 font-bold">
+
+                لا توجد منتجات حالياً.
+
+                <br>
+
+                قم بإضافة منتج جديد.
+
+            </div>
+        `;
+
+        lucide.createIcons();
+
+        return;
+    }
+
+
+    container.innerHTML =
+        storeProducts.map(product => {
+
+            const categoryName =
+                getCategoryName(product.category);
+
+
+            return `
+
+                <div class="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex items-center gap-3">
+
+                    <img
+                        src="${escapeHtml(product.image || '')}"
+                        onerror="this.style.display='none'"
+                        class="w-16 h-16 rounded-xl object-cover shrink-0"
+                        alt="">
+
+                    <div class="flex-1 min-w-0">
+
+                        <h4 class="font-bold text-sm truncate">
+
+                            ${escapeHtml(product.name)}
+
+                        </h4>
+
+
+                        <p class="text-xs text-gray-400 mt-1">
+
+                            ${escapeHtml(categoryName)}
+
+                        </p>
+
+
+                        <p class="text-sm font-black text-brand-600 mt-1">
+
+                            ${Number(product.price || 0).toFixed(2)}
+                            ج.م
+
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        onclick="deleteProduct('${product.id}')"
+                        class="p-2.5 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-xl transition-all"
+                        title="حذف المنتج">
+
+                        <i
+                            data-lucide="trash-2"
+                            class="w-5 h-5">
+                        </i>
+
+                    </button>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+
+    lucide.createIcons();
+
+}
+
+
+/* =========================================================
+   إضافة منتج
+   ========================================================= */
+
+async function handleAddProduct(event) {
+
+    event.preventDefault();
+
+
+    const name =
+        document.getElementById("p-name").value.trim();
+
+
+    const category =
+        document.getElementById("p-category").value;
+
+
+    const description =
+        document.getElementById("p-description").value.trim();
+
+
+    const price =
+        Number(document.getElementById("p-price").value);
+
+
+    const image =
+        document.getElementById("p-image").value.trim();
+
+
+    if (!name || !price || !image) {
+
+        alert("من فضلك أكمل بيانات المنتج.");
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById("save-product-btn");
+
+
+    button.disabled = true;
+
+    button.innerText =
+        "جاري الحفظ...";
+
+
+    try {
+
+        await supabaseRequest(
+            "/rest/v1/products",
+            {
+                method: "POST",
+
+                headers: {
+                    "Prefer": "return=representation"
+                },
+
+                body: JSON.stringify({
+
+                    name: name,
+
+                    category: category,
+
+                    description: description,
+
+                    price: price,
+
+                    image: image
+
+                })
+            }
+        );
+
+
+        alert(
+            `تم إضافة المنتج "${name}" بنجاح`
+        );
+
+
+        document
+            .getElementById("product-form")
+            .reset();
+
+
+        await loadProducts();
+
+        switchTab("products");
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "لم يتم حفظ المنتج.\n\n" +
+            error.message
+        );
+
+    }
+
+
+    button.disabled = false;
+
+    button.innerText =
+        "حفظ ونشر المنتج";
+
+}
+
+
+/* =========================================================
+   حذف منتج
+   ========================================================= */
+
+async function deleteProduct(productId) {
+
+    const product =
+        storeProducts.find(
+            p => p.id === productId
+        );
+
+
+    if (!product) {
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            `هل أنت متأكد من حذف المنتج "${product.name}"؟`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        await supabaseRequest(
+            `/rest/v1/products?id=eq.${encodeURIComponent(productId)}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+
+        storeProducts =
+            storeProducts.filter(
+                p => p.id !== productId
+            );
+
+
+        renderProducts();
+
+
+        alert("تم حذف المنتج بنجاح.");
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "لم يتم حذف المنتج.\n\n" +
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   الأقسام
+   ========================================================= */
+
+function getCategoryName(category) {
+
+    const categories = {
+
+        chocolates:
+            "شوكولاتة",
+
+        dairy:
+            "ألبان وأجبان",
+
+        canned:
+            "مخازن ومعلبات",
+
+        drinks:
+            "مشروبات ومياه",
+
+        cleaners:
+            "منظفات"
+
+    };
+
+
+    return categories[category] || category || "بدون قسم";
+
+}
+
+
+/* =========================================================
+   التنقل
+   ========================================================= */
+
+function switchTab(tab) {
+
+    document
+        .querySelectorAll(".section-view")
+        .forEach(
+            element =>
+                element.classList.add("hidden")
+        );
+
+
+    const tabs = [
+        "dt-tab-orders",
+        "dt-tab-products",
+        "dt-tab-add",
+        "mb-tab-orders",
+        "mb-tab-products",
+        "mb-tab-add"
+    ];
+
+
+    tabs.forEach(id => {
+
+        const element =
+            document.getElementById(id);
+
+        if (!element) {
+            return;
+        }
+
+
+        element.classList.remove(
+            "bg-brand-50",
+            "text-brand-600",
+            "dark:bg-brand-900/30",
+            "dark:text-brand-400"
+        );
+
+
+        element.classList.add(
+            "text-gray-400"
+        );
+
+    });
+
+
+    if (tab === "orders") {
+
+        document
+            .getElementById("section-orders")
+            .classList.remove("hidden");
+
+
+        activateTab(
+            "dt-tab-orders",
+            "mb-tab-orders"
+        );
+
+
+        document
+            .getElementById("page-title")
+            .innerText =
+            "استقبال الطلبات";
+
+    }
+
+
+    else if (tab === "products") {
+
+        document
+            .getElementById("section-products")
+            .classList.remove("hidden");
+
+
+        activateTab(
+            "dt-tab-products",
+            "mb-tab-products"
+        );
+
+
+        document
+            .getElementById("page-title")
+            .innerText =
+            "إدارة وحذف المنتجات";
+
+
+        loadProducts();
+
+    }
+
+
+    else if (tab === "add-product") {
+
+        document
+            .getElementById("section-add-product")
+            .classList.remove("hidden");
+
+
+        activateTab(
+            "dt-tab-add",
+            "mb-tab-add"
+        );
+
+
+        document
+            .getElementById("page-title")
+            .innerText =
+            "إضافة منتج جديد";
+
+    }
+
+}
+
+
+/* تفعيل زر */
+
+function activateTab(desktopId, mobileId) {
+
+    const desktop =
+        document.getElementById(desktopId);
+
+
+    const mobile =
+        document.getElementById(mobileId);
+
+
+    if (desktop) {
+
+        desktop.classList.add(
+            "bg-brand-50",
+            "text-brand-600",
+            "dark:bg-brand-900/30",
+            "dark:text-brand-400"
+        );
+
+    }
+
+
+    if (mobile) {
+
+        mobile.classList.remove(
+            "text-gray-400"
+        );
+
+
+        mobile.classList.add(
+            "text-brand-600"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   الوضع الداكن
+   ========================================================= */
+
+function toggleDarkMode() {
+
+    document
+        .documentElement
+        .classList.toggle("dark");
+
+}
+
+
+/* =========================================================
+   حماية عرض النصوص
+   ========================================================= */
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* =========================================================
+   تشغيل الصفحة
+   ========================================================= */
+
+lucide.createIcons();
+
+loadProducts();
+
+</script>
+
+</body>
+</html>
