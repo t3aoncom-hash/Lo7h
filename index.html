@@ -113,9 +113,11 @@ class="sidebar fixed right-0 top-0 bottom-0 w-72 bg-white border-l border-gray-2
 
     <nav class="p-4 space-y-2 flex-1">
 
+        <!-- الرئيسية -->
+
         <button
         onclick="showPage('dashboard')"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-green-50 text-green-700 font-bold">
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
 
             <i data-lucide="layout-dashboard"></i>
 
@@ -123,6 +125,8 @@ class="sidebar fixed right-0 top-0 bottom-0 w-72 bg-white border-l border-gray-2
 
         </button>
 
+
+        <!-- الطلبات -->
 
         <button
         onclick="showPage('orders')"
@@ -141,6 +145,8 @@ class="sidebar fixed right-0 top-0 bottom-0 w-72 bg-white border-l border-gray-2
         </button>
 
 
+        <!-- المنتجات -->
+
         <button
         onclick="showPage('products')"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
@@ -151,6 +157,29 @@ class="sidebar fixed right-0 top-0 bottom-0 w-72 bg-white border-l border-gray-2
 
         </button>
 
+
+        <!-- غير متوفر -->
+
+        <button
+        onclick="showPage('unavailable')"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50">
+
+            <i data-lucide="package-x"></i>
+
+            <span>
+                غير متوفر
+            </span>
+
+            <span
+            id="sideUnavailableCount"
+            class="mr-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                0
+            </span>
+
+        </button>
+
+
+        <!-- الأقسام -->
 
         <button
         onclick="showPage('categories')"
@@ -249,7 +278,6 @@ class="fixed inset-0 bg-black/40 z-[60] hidden">
         <section id="page-dashboard">
 
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-
 
                 <div class="card bg-white rounded-2xl p-5 border">
 
@@ -369,8 +397,6 @@ class="fixed inset-0 bg-black/40 z-[60] hidden">
             </div>
 
 
-            <!-- أحدث الطلبات -->
-
             <div class="bg-white rounded-2xl border overflow-hidden">
 
                 <div class="p-5 border-b flex items-center justify-between">
@@ -482,6 +508,36 @@ class="fixed inset-0 bg-black/40 z-[60] hidden">
 
             <div
             id="productsList"
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             UNAVAILABLE
+        ========================= -->
+
+        <section
+        id="page-unavailable"
+        class="hidden">
+
+            <div class="mb-5">
+
+                <h3 class="text-xl font-black">
+                    المنتجات غير المتوفرة
+                </h3>
+
+                <p class="text-sm text-gray-400 mt-1">
+                    المنتجات التي نفد مخزونها بالكامل
+                </p>
+
+            </div>
+
+
+            <div
+            id="unavailableList"
             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
 
             </div>
@@ -790,6 +846,7 @@ class="fixed inset-0 bg-black/60 z-[100] hidden items-center justify-center p-4"
                     <input
                     id="productStock"
                     type="number"
+                    min="0"
                     class="w-full border rounded-xl p-3 outline-none focus:border-green-500">
 
                 </div>
@@ -952,6 +1009,8 @@ async function loadProducts() {
     result.data || [];
 
     renderProducts();
+
+    renderUnavailableProducts();
 }
 
 
@@ -1042,6 +1101,21 @@ function updateStats() {
         "sideOrdersCount"
     ).innerText =
     orders.length;
+
+
+    /* عدد المنتجات غير المتوفرة */
+
+    const unavailableCount =
+    products.filter(
+        product =>
+        Number(product.stock || 0) <= 0
+    ).length;
+
+
+    document.getElementById(
+        "sideUnavailableCount"
+    ).innerText =
+    unavailableCount;
 }
 
 
@@ -2122,6 +2196,14 @@ function renderProducts() {
                 )
             );
 
+            const stock =
+            Number(
+                product.stock || 0
+            );
+
+            const unavailable =
+            stock <= 0;
+
 
             return `
 
@@ -2132,7 +2214,7 @@ function renderProducts() {
                         <img
                         src="${product.image || "https://placehold.co/600x450?text=Product"}"
                         class="w-full h-48 object-cover"
-                        onerror="this.src='https://placehold.co/600x450?text=Product'">
+                        onerror="this.src='https://placehold.co/600x450?text=Product'>">
 
 
                         <span
@@ -2149,6 +2231,32 @@ function renderProducts() {
                             }
 
                         </span>
+
+
+                        ${
+                            unavailable
+                            ?
+
+                            `
+                            <span
+                            class="absolute top-3 left-3 bg-red-500 text-white px-3 py-1.5 rounded-full text-xs font-black shadow">
+
+                                غير متوفر
+
+                            </span>
+                            `
+
+                            :
+
+                            `
+                            <span
+                            class="absolute top-3 left-3 bg-green-600 text-white px-3 py-1.5 rounded-full text-xs font-black shadow">
+
+                                متوفر
+
+                            </span>
+                            `
+                        }
 
                     </div>
 
@@ -2186,10 +2294,17 @@ function renderProducts() {
                             </strong>
 
 
-                            <span class="text-xs text-gray-400">
+                            <span
+                            class="text-xs font-bold ${
+                                unavailable
+                                ?
+                                "text-red-500"
+                                :
+                                "text-gray-400"
+                            }">
 
                                 المخزون:
-                                ${product.stock || 0}
+                                ${stock}
 
                             </span>
 
@@ -2216,6 +2331,184 @@ function renderProducts() {
                             </button>
 
                         </div>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+    )
+    .join("");
+
+
+    lucide.createIcons();
+}
+
+
+/* =========================
+   UNAVAILABLE PRODUCTS
+========================= */
+
+function renderUnavailableProducts() {
+
+    const box =
+    document.getElementById(
+        "unavailableList"
+    );
+
+
+    const unavailableProducts =
+    products.filter(
+        product =>
+        Number(product.stock || 0) <= 0
+    );
+
+
+    document.getElementById(
+        "sideUnavailableCount"
+    ).innerText =
+    unavailableProducts.length;
+
+
+    if (!unavailableProducts.length) {
+
+        box.innerHTML = `
+
+            <div class="col-span-full bg-white border rounded-2xl p-12 text-center">
+
+                <div class="w-16 h-16 mx-auto rounded-2xl bg-green-50 text-green-600 flex items-center justify-center">
+
+                    <i data-lucide="package-check"></i>
+
+                </div>
+
+                <h3 class="font-black text-lg mt-4">
+
+                    لا توجد منتجات غير متوفرة
+
+                </h3>
+
+                <p class="text-sm text-gray-400 mt-2">
+
+                    جميع المنتجات لديها مخزون حاليًا
+
+                </p>
+
+            </div>
+
+        `;
+
+        lucide.createIcons();
+
+        return;
+    }
+
+
+    box.innerHTML =
+    unavailableProducts
+    .map(
+        product => {
+
+            const category =
+            categories.find(
+                item =>
+                Number(item.id)
+                ===
+                Number(
+                    product.category_id
+                )
+            );
+
+
+            return `
+
+                <div class="card bg-white border border-red-100 rounded-2xl overflow-hidden">
+
+                    <div class="relative">
+
+                        <img
+                        src="${product.image || "https://placehold.co/600x450?text=Product"}"
+                        class="w-full h-48 object-cover"
+                        onerror="this.src='https://placehold.co/600x450?text=Product'">
+
+
+                        <span
+                        class="absolute top-3 left-3 bg-red-500 text-white px-3 py-1.5 rounded-full text-xs font-black shadow">
+
+                            غير متوفر
+
+                        </span>
+
+
+                        <span
+                        class="absolute top-3 right-3 bg-white/90 px-3 py-1 rounded-full text-xs font-bold">
+
+                            ${
+                                category
+                                ?
+                                escapeHTML(
+                                    category.name
+                                )
+                                :
+                                "بدون قسم"
+                            }
+
+                        </span>
+
+                    </div>
+
+
+                    <div class="p-4">
+
+                        <h3 class="font-black text-lg">
+
+                            ${escapeHTML(
+                                product.name
+                            )}
+
+                        </h3>
+
+
+                        <p class="text-sm text-gray-400 mt-1">
+
+                            ${escapeHTML(
+                                product.description || ""
+                            )}
+
+                        </p>
+
+
+                        <div class="mt-4 flex items-center justify-between">
+
+                            <strong class="text-green-600">
+
+                                ${Number(
+                                    product.price || 0
+                                ).toFixed(2)}
+
+                                ج.م
+
+                            </strong>
+
+
+                            <span class="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-black">
+
+                                المخزون: 0
+
+                            </span>
+
+                        </div>
+
+
+                        <button
+                        onclick="editProduct(${product.id})"
+                        class="w-full mt-4 bg-green-600 text-white py-2.5 rounded-xl font-bold">
+
+                            تعديل المخزون
+
+                        </button>
 
                     </div>
 
@@ -2491,6 +2784,16 @@ async function saveProduct() {
     }
 
 
+    if (isNaN(stock) || stock < 0) {
+
+        alert(
+            "المخزون يجب أن يكون 0 أو أكثر"
+        );
+
+        return;
+    }
+
+
     const data = {
 
         category_id:
@@ -2608,6 +2911,7 @@ function showPage(page) {
         "dashboard",
         "orders",
         "products",
+        "unavailable",
         "categories"
     ];
 
@@ -2643,6 +2947,8 @@ function showPage(page) {
         orders: "الطلبات",
 
         products: "المنتجات",
+
+        unavailable: "غير متوفر",
 
         categories: "الأقسام"
 
