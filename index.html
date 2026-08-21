@@ -752,10 +752,20 @@
         }
 
         function initSearchableCompanySelect() {
+            const selectEl = document.getElementById("productCompany");
+            if (!selectEl) return;
+
             if (companyTomSelect) {
-                companyTomSelect.destroy();
+                // إذا كان محدد مسبقاً، نقوم بتحديث الخيارات وإعادة المزامنة بدلاً من تدميره بالكامل
+                companyTomSelect.clearOptions();
+                companies.forEach(comp => {
+                    companyTomSelect.addOption({value: comp.id, text: comp.name});
+                });
+                companyTomSelect.refreshOptions(false);
+                return;
             }
-            companyTomSelect = new TomSelect("#productCompany", {
+
+            companyTomSelect = new TomSelect(selectEl, {
                 create: false,
                 sortField: { field: "text", direction: "asc" },
                 onChange: function(value) {
@@ -769,7 +779,7 @@
             if (!select) return;
             select.innerHTML = `<option value="">اختر الشركة</option>` + companies.map(comp => `<option value="${comp.id}">${escapeHTML(comp.name)}</option>`).join("");
             
-            // تفعيل ميزة البحث للشركات داخل نافذة المنتجات
+            // تحديث أو تفعيل ميزة البحث للشركات داخل نافذة المنتجات
             initSearchableCompanySelect();
         }
 
