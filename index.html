@@ -10,6 +10,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- Tom Select CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+    <!-- Tom Select JS -->
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -224,15 +229,29 @@
 
             <!-- PRODUCTS SECTION -->
             <section id="page-products" class="hidden">
-                <div class="flex flex-col md:flex-row gap-4 justify-between mb-5">
+                <div class="flex flex-col md:flex-row gap-4 justify-between items-center mb-5">
                     <div>
                         <h3 class="text-xl font-black">المنتجات</h3>
-                        <p class="text-sm text-gray-400">إضافة وتعديل وحذف المنتجات</p>
+                        <p class="text-sm text-gray-400">إبحث، أضف وعدل المنتجات بكل سهولة</p>
                     </div>
-                    <button onclick="openProductModal()" class="bg-green-600 text-white px-5 py-3 rounded-xl font-bold flex items-center justify-center gap-2">
-                        <i data-lucide="plus"></i> إضافة منتج
+                    <button onclick="openProductModal()" class="w-full md:w-auto bg-green-600 text-white px-5 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-sm">
+                        <i data-lucide="plus"></i> إضافة منتج جديد
                     </button>
                 </div>
+
+                <!-- أدوات البحث والفلترة للمنتجات -->
+                <div class="bg-white p-4 rounded-2xl border mb-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="relative md:col-span-2">
+                        <i data-lucide="search" class="absolute right-4 top-3.5 text-gray-400 w-5 h-5"></i>
+                        <input id="productSearchInput" type="text" oninput="filterProducts()" placeholder="ابحث باسم المنتج أو الوصف..." class="w-full border rounded-xl pr-12 pl-4 py-3 outline-none focus:border-green-500 bg-gray-50 text-sm">
+                    </div>
+                    <div>
+                        <select id="productFilterCategory" onchange="filterProducts()" class="w-full border rounded-xl px-4 py-3 outline-none focus:border-green-500 bg-gray-50 text-sm">
+                            <option value="">جميع الأقسام</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div id="productsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
             </section>
 
@@ -247,13 +266,13 @@
 
             <!-- CATEGORIES SECTION -->
             <section id="page-categories" class="hidden">
-                <div class="flex flex-col md:flex-row gap-4 justify-between mb-5">
+                <div class="flex flex-col md:flex-row gap-4 justify-between items-center mb-5">
                     <div>
                         <h3 class="text-xl font-black">الأقسام</h3>
                         <p class="text-sm text-gray-400">إدارة أقسام المتجر</p>
                     </div>
-                    <button onclick="openCategoryModal()" class="bg-green-600 text-white px-5 py-3 rounded-xl font-bold flex items-center justify-center gap-2">
-                        <i data-lucide="plus"></i> إضافة قسم
+                    <button onclick="openCategoryModal()" class="w-full md:w-auto bg-green-600 text-white px-5 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-sm">
+                        <i data-lucide="plus"></i> إضافة قسم جديد
                     </button>
                 </div>
                 <div id="categoriesList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
@@ -261,15 +280,29 @@
 
             <!-- COMPANIES SECTION -->
             <section id="page-companies" class="hidden">
-                <div class="flex flex-col md:flex-row gap-4 justify-between mb-5">
+                <div class="flex flex-col md:flex-row gap-4 justify-between items-center mb-5">
                     <div>
                         <h3 class="text-xl font-black">الشركات</h3>
-                        <p class="text-sm text-gray-400">إدارة الشركات والجهات المرتبطة</p>
+                        <p class="text-sm text-gray-400">إدارة الشركات والجهات المرتبطة والبحث فيها</p>
                     </div>
-                    <button onclick="openCompanyModal()" class="bg-green-600 text-white px-5 py-3 rounded-xl font-bold flex items-center justify-center gap-2">
-                        <i data-lucide="plus"></i> إضافة شركة
+                    <button onclick="openCompanyModal()" class="w-full md:w-auto bg-green-600 text-white px-5 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-sm">
+                        <i data-lucide="plus"></i> إضافة شركة جديدة
                     </button>
                 </div>
+
+                <!-- أدوات البحث والفلترة للشركات -->
+                <div class="bg-white p-4 rounded-2xl border mb-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="relative md:col-span-2">
+                        <i data-lucide="search" class="absolute right-4 top-3.5 text-gray-400 w-5 h-5"></i>
+                        <input id="companySearchInput" type="text" oninput="filterCompanies()" placeholder="ابحث باسم الشركة أو الوصف..." class="w-full border rounded-xl pr-12 pl-4 py-3 outline-none focus:border-green-500 bg-gray-50 text-sm">
+                    </div>
+                    <div>
+                        <select id="companyFilterCategory" onchange="filterCompanies()" class="w-full border rounded-xl px-4 py-3 outline-none focus:border-green-500 bg-gray-50 text-sm">
+                            <option value="">جميع الأقسام للشركات</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div id="companiesList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
             </section>
 
@@ -371,7 +404,7 @@
                 </div>
                 <div>
                     <label class="text-sm font-bold block mb-2">الشركة المنتجة / الموردة</label>
-                    <select id="productCompany" class="w-full border rounded-xl p-3 outline-none focus:border-green-500 bg-white"></select>
+                    <select id="productCompany" onchange="autoSelectCategory()" class="w-full border rounded-xl p-3 outline-none focus:border-green-500 bg-white"></select>
                 </div>
                 <div>
                     <label class="text-sm font-bold block mb-2">الوصف</label>
@@ -408,6 +441,7 @@
         let products = [];
         let orders = [];
         let companies = [];
+        let companyTomSelect = null; // متغير لتخزين نسخة Tom Select
 
         document.addEventListener("DOMContentLoaded", async () => {
             lucide.createIcons();
@@ -431,6 +465,7 @@
             renderCategories();
             fillProductCategories();
             fillCompanyCategories();
+            fillFilterDropdowns();
         }
 
         async function loadCompanies() {
@@ -620,6 +655,17 @@
             select.innerHTML = `<option value="">اختر القسم</option>` + categories.map(c => `<option value="${c.id}">${escapeHTML(c.name)}</option>`).join("");
         }
 
+        function fillFilterDropdowns() {
+            const prodFilter = document.getElementById("productFilterCategory");
+            if (prodFilter) {
+                prodFilter.innerHTML = `<option value="">جميع الأقسام</option>` + categories.map(c => `<option value="${c.id}">${escapeHTML(c.name)}</option>`).join("");
+            }
+            const compFilter = document.getElementById("companyFilterCategory");
+            if (compFilter) {
+                compFilter.innerHTML = `<option value="">جميع الأقسام للشركات</option>` + categories.map(c => `<option value="${c.id}">${escapeHTML(c.name)}</option>`).join("");
+            }
+        }
+
         function openCategoryModal() {
             document.getElementById("categoryId").value = "";
             document.getElementById("categoryName").value = "";
@@ -664,14 +710,14 @@
             updateStats();
         }
 
-        /* --- Companies Logic --- */
-        function renderCompanies() {
+        /* --- Companies Logic & Filtering --- */
+        function renderCompanies(listToRender = companies) {
             const box = document.getElementById("companiesList");
-            if (!companies.length) {
-                box.innerHTML = `<div class="col-span-full bg-white rounded-2xl p-10 text-center text-gray-400">لا توجد شركات مضافة</div>`;
+            if (!listToRender.length) {
+                box.innerHTML = `<div class="col-span-full bg-white rounded-2xl p-10 text-center text-gray-400">لا توجد شركات مطابقة للبحث</div>`;
                 return;
             }
-            box.innerHTML = companies.map(company => {
+            box.innerHTML = listToRender.map(company => {
                 const category = categories.find(item => Number(item.id) === Number(company.category_id));
                 return `
                     <div class="card bg-white border rounded-2xl p-5">
@@ -693,10 +739,51 @@
             lucide.createIcons();
         }
 
+        function filterCompanies() {
+            const query = document.getElementById("companySearchInput").value.trim().toLowerCase();
+            const catId = document.getElementById("companyFilterCategory").value;
+
+            const filtered = companies.filter(company => {
+                const matchesQuery = !query || company.name.toLowerCase().includes(query) || (company.description && company.description.toLowerCase().includes(query));
+                const matchesCat = !catId || Number(company.category_id) === Number(catId);
+                return matchesQuery && matchesCat;
+            });
+            renderCompanies(filtered);
+        }
+
+        function initSearchableCompanySelect() {
+            if (companyTomSelect) {
+                companyTomSelect.destroy();
+            }
+            companyTomSelect = new TomSelect("#productCompany", {
+                create: false,
+                sortField: { field: "text", direction: "asc" },
+                onChange: function(value) {
+                    autoSelectCategory();
+                }
+            });
+        }
+
         function fillProductCompanies() {
             const select = document.getElementById("productCompany");
             if (!select) return;
             select.innerHTML = `<option value="">اختر الشركة</option>` + companies.map(comp => `<option value="${comp.id}">${escapeHTML(comp.name)}</option>`).join("");
+            
+            // تفعيل ميزة البحث للشركات داخل نافذة المنتجات
+            initSearchableCompanySelect();
+        }
+
+        // الربط التلقائي للقسم بناءً على الشركة المختارة
+        function autoSelectCategory() {
+            const companyId = companyTomSelect ? companyTomSelect.getValue() : document.getElementById("productCompany").value;
+            const categorySelect = document.getElementById("productCategory");
+            
+            if (!companyId) return;
+
+            const selectedCompany = companies.find(c => Number(c.id) === Number(companyId));
+            if (selectedCompany && selectedCompany.category_id) {
+                categorySelect.value = selectedCompany.category_id;
+            }
         }
 
         function openCompanyModal() {
@@ -762,14 +849,14 @@
             updateStats();
         }
 
-        /* --- Products Logic --- */
-        function renderProducts() {
+        /* --- Products Logic & Filtering --- */
+        function renderProducts(listToRender = products) {
             const box = document.getElementById("productsList");
-            if (!products.length) {
-                box.innerHTML = `<div class="col-span-full bg-white rounded-2xl p-12 text-center text-gray-400">لا توجد منتجات</div>`;
+            if (!listToRender.length) {
+                box.innerHTML = `<div class="col-span-full bg-white rounded-2xl p-12 text-center text-gray-400">لا توجد منتجات مطابقة للبحث</div>`;
                 return;
             }
-            box.innerHTML = products.map(product => {
+            box.innerHTML = listToRender.map(product => {
                 const category = categories.find(item => Number(item.id) === Number(product.category_id));
                 const company = companies.find(item => Number(item.id) === Number(product.company_id));
                 const stock = Number(product.stock || 0);
@@ -799,6 +886,18 @@
                 `;
             }).join("");
             lucide.createIcons();
+        }
+
+        function filterProducts() {
+            const query = document.getElementById("productSearchInput").value.trim().toLowerCase();
+            const catId = document.getElementById("productFilterCategory").value;
+
+            const filtered = products.filter(product => {
+                const matchesQuery = !query || product.name.toLowerCase().includes(query) || (product.description && product.description.toLowerCase().includes(query));
+                const matchesCat = !catId || Number(product.category_id) === Number(catId);
+                return matchesQuery && matchesCat;
+            });
+            renderProducts(filtered);
         }
 
         function renderUnavailableProducts() {
@@ -843,7 +942,11 @@
             document.getElementById("productStock").value = "0";
             document.getElementById("productImage").value = "";
             document.getElementById("productCategory").value = "";
-            document.getElementById("productCompany").value = "";
+            if (companyTomSelect) {
+                companyTomSelect.setValue("");
+            } else {
+                document.getElementById("productCompany").value = "";
+            }
             document.getElementById("productModalTitle").innerText = "إضافة منتج";
             openModal("productModal");
         }
@@ -860,7 +963,13 @@
             document.getElementById("productStock").value = product.stock || 0;
             document.getElementById("productImage").value = product.image || "";
             document.getElementById("productCategory").value = product.category_id || "";
-            document.getElementById("productCompany").value = product.company_id || "";
+            
+            if (companyTomSelect) {
+                companyTomSelect.setValue(product.company_id || "");
+            } else {
+                document.getElementById("productCompany").value = product.company_id || "";
+            }
+
             document.getElementById("productModalTitle").innerText = "تعديل المنتج";
             openModal("productModal");
         }
@@ -869,7 +978,7 @@
             const id = document.getElementById("productId").value;
             const name = document.getElementById("productName").value.trim();
             const category = document.getElementById("productCategory").value;
-            const company = document.getElementById("productCompany").value;
+            const company = companyTomSelect ? companyTomSelect.getValue() : document.getElementById("productCompany").value;
             const description = document.getElementById("productDescription").value.trim();
             const price = Number(document.getElementById("productPrice").value);
             const stock = Number(document.getElementById("productStock").value);
